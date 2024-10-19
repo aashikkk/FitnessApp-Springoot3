@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class RunRepository {
@@ -37,10 +38,10 @@ public class RunRepository {
         ));
     }
 
-    public Run findById(Integer id) {
+    public Optional<Run> findById(Integer id) {
         return runs.stream()
                 .filter(run -> run.id() == id)
-                .findFirst()
-                .get();
+                .findFirst();
+
     }
 }

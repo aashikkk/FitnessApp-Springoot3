@@ -144,7 +144,7 @@ Also, no need to put Autowired to constructor as well, That's implicit. That is 
 Correct one.
 ![img_2.png](img_2.png)
 
-Can check endpoint result in cmd as well. Install httpie to use this. Otherwise, use curl as well.
+You Can check an endpoint result in cmd as well. Install httpie to use this. Otherwise, use curl as well.
     `http :8080/api/runs`
 
 

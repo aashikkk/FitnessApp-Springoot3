@@ -38,10 +38,24 @@ public class RunRepository {
         ));
     }
 
+
     public Optional<Run> findById(Integer id) {
         return runs.stream()
-                .filter(run -> run.id() == id)
+                .filter(run -> run.id().equals(id))
                 .findFirst();
 
+    }
+
+    void Create(Run run){
+        runs.add(run);
+    }
+
+    void Update(Run run, Integer id){
+        Optional<Run> existingRun = findById(id);
+        existingRun.ifPresent(value -> runs.set(runs.indexOf(value), run));
+    }
+
+    void Delete(Integer id){
+        runs.removeIf(run -> run.id().equals(id));
     }
 }

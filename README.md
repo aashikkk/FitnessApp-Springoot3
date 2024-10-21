@@ -147,6 +147,11 @@ Correct one.
 You Can check an endpoint result in cmd as well. Install httpie to use this. Otherwise, use curl as well.
     `http :8080/api/runs`
 
+After defining endpoints and methods, we need to validate those methods.
+1. Validator Dependency
+2. Custom Throw Exceptions
+3. Logical Custom Validation
+4. Model Direct validation
 
 Note: 
 * To create an object.

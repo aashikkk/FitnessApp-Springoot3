@@ -153,6 +153,13 @@ After defining endpoints and methods, we need to validate those methods.
 3. Logical Custom Validation
 4. Model Direct validation
 
+To connect with the DB, we are using these dependencies
+- H2 db (In memory database)
+- jdbc api --> to talk to the database.
+
+Since we are using In memory db, we need special schema to start with.
+for that we can add schema.sql in resources folder.
+
 Note: 
 * To create an object.
   1. [x] context.getBean("nameOfClass").var --> enter, then it will create a Object.

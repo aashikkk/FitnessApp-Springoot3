@@ -160,6 +160,41 @@ To connect with the DB, we are using these dependencies
 Since we are using In memory db, we need special schema to start with.
 for that we can add schema.sql in resources folder.
 
+#### Dependency Injection
+
+##### Constructor Based
+Initialized through the constructor.
+
+    public class SimpleMovieLister {
+    
+        // the SimpleMovieLister has a dependency on a MovieFinder
+        private final MovieFinder movieFinder;
+    
+        // a constructor so that the Spring container can inject a MovieFinder
+        public SimpleMovieLister(MovieFinder movieFinder) {
+            this.movieFinder = movieFinder;
+        }
+    
+        // business logic that actually uses the injected MovieFinder is omitted...
+    }
+
+##### Setter Based
+Initialized through the setter.
+
+    public class SimpleMovieLister {
+    
+        // the SimpleMovieLister has a dependency on the MovieFinder
+        private MovieFinder movieFinder;
+    
+        // a setter method so that the Spring container can inject a MovieFinder
+        public void setMovieFinder(MovieFinder movieFinder) {
+            this.movieFinder = movieFinder;
+        }
+    
+        // business logic that actually uses the injected MovieFinder is omitted...
+    }
+
+
 Note: 
 * To create an object.
   1. [x] context.getBean("nameOfClass").var --> enter, then it will create a Object.

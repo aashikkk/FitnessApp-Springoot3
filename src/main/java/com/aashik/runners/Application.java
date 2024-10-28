@@ -21,13 +21,14 @@ public class Application {
 		SpringApplication.run(Application.class, args);
 	}
 
-	@Bean
-	CommandLineRunner runner(RunRepository runRepository) {
-		return args -> {
-			Run run = new Run(1, "first Run", LocalDateTime.now(), LocalDateTime.now().plusHours(1), 5, Location.OUTDOOR);
-			runRepository.Create(run);
-		};
-	}
+	// We can bootstrap the data by this as well
+//	@Bean
+//	CommandLineRunner runner(RunRepository runRepository) {
+//		return args -> {
+//			Run run = new Run(1, "first Run", LocalDateTime.now(), LocalDateTime.now().plusHours(1), 5, Location.OUTDOOR);
+//			runRepository.Create(run);
+//		};
+//	}
 
 
 }

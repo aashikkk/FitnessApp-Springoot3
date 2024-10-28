@@ -194,6 +194,84 @@ Initialized through the setter.
         // business logic that actually uses the injected MovieFinder is omitted...
     }
 
+##### Run JSON Data into DB
+
+```java
+package com.aashik.runners.run;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.asm.TypeReference;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+@Component
+public class RunJsonDataLoader implements CommandLineRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(RunJsonDataLoader.class);
+    private final RunRepository runRepository;
+    private final ObjectMapper objectMapper;
+
+    public RunJsonDataLoader(RunRepository runRepository, ObjectMapper objectMapper) {
+        this.runRepository = runRepository;
+        this.objectMapper = objectMapper;
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        if(runRepository.count() == 0){
+            try (InputStream inputStream = TypeReference.class.getResourceAsStream("/data/runs.json")) {
+                Runs allRuns = objectMapper.readValue(inputStream, Runs.class);
+                log.info("Reading {} runs from JSON Data and saving them to the database", allRuns.runs().size());
+                runRepository.saveAll(allRuns.runs());
+            }
+            catch (IOException e){
+                throw new RuntimeException("Failed to read JSON data");
+            }
+        }
+        else{
+            log.info("Not loading runs from JSON data because the collection is contains data");
+        }
+    }
+}
+
+
+
+```
+
+```java
+package com.aashik.runners.run;
+
+import java.util.List;
+
+public record Runs(List<Run> runs) {
+}
+
+```
+
+### Using PostgreSQL
+
+Update `application.properties`
+
+```properties
+spring.application.name=runnerz
+#server.port=8085
+#spring.h2.console.enabled=true
+#spring.datasource.generate-unique-name=false
+spring.datasource.name=runnerz
+spring.datasource.url=jdbc:postgresql://localhost:5432/runnerz
+spring.datasource.username=
+spring.datasource.password=
+
+```
+
+`Schema.sql` will not work anymore when you are running MySQL or PostgreSQL.
+
+
 
 Note: 
 * To create an object.

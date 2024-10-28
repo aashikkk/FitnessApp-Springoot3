@@ -213,27 +213,25 @@ import java.io.InputStream;
 public class RunJsonDataLoader implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(RunJsonDataLoader.class);
-    private final RunRepository runRepository;
+    private final JdbcClientRunRepository runRepository;
     private final ObjectMapper objectMapper;
 
-    public RunJsonDataLoader(RunRepository runRepository, ObjectMapper objectMapper) {
+    public RunJsonDataLoader(JdbcClientRunRepository runRepository, ObjectMapper objectMapper) {
         this.runRepository = runRepository;
         this.objectMapper = objectMapper;
     }
 
     @Override
     public void run(String... args) throws Exception {
-        if(runRepository.count() == 0){
+        if (runRepository.count() == 0) {
             try (InputStream inputStream = TypeReference.class.getResourceAsStream("/data/runs.json")) {
                 Runs allRuns = objectMapper.readValue(inputStream, Runs.class);
                 log.info("Reading {} runs from JSON Data and saving them to the database", allRuns.runs().size());
                 runRepository.saveAll(allRuns.runs());
-            }
-            catch (IOException e){
+            } catch (IOException e) {
                 throw new RuntimeException("Failed to read JSON data");
             }
-        }
-        else{
+        } else {
             log.info("Not loading runs from JSON data because the collection is contains data");
         }
     }
@@ -271,7 +269,59 @@ spring.datasource.password=
 
 `Schema.sql` will not work anymore when you are running MySQL or PostgreSQL.
 
+PostgreSQL Driver and Docker compose support and Spring Data JDBC.
 
+```xml
+        <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-docker-compose</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+        <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jdbc</artifactId>
+        </dependency>
+```
+
+```dockerfile
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=runnerz'
+      - 'POSTGRES_PASSWORD=password'
+      - 'POSTGRES_USER=aash'
+    ports:
+      - '5432:5432'
+```
+
+We are using this for just the row is existing or new.
+```Run record
+@Version
+Integer version
+```
+
+Can run our own query as well.
+
+```java
+import org.springframework.data.jdbc.repository.query.Query;
+
+@Repository
+public interface RunRepository extends ListCrudRepository<Run, Integer> {
+
+    List<Run> findAllByLocation(String location);
+
+    @Query("SELECT * FROM run WHERE location = :location")
+    List<Run> findByLocation(String location);
+}
+
+```
 
 Note: 
 * To create an object.

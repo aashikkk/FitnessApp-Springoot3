@@ -1,9 +1,15 @@
 package com.aashik.runners;
 
+import com.aashik.runners.user.User;
+import com.aashik.runners.user.UserRestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+
+import java.util.List;
 
 @SpringBootApplication
 public class Application {
@@ -11,6 +17,17 @@ public class Application {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
+	}
+
+	@Bean
+	CommandLineRunner runner(UserRestClient client) {
+		return args -> {
+			List<User> users = client.findAll();
+			System.out.println(users);
+
+			User user = client.findById(1);
+			System.out.println(user);
+		};
 	}
 
 	// We can bootstrap the data by this as well
@@ -21,6 +38,4 @@ public class Application {
 //			runRepository.Create(run);
 //		};
 //	}
-
-
 }

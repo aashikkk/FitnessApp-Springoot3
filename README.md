@@ -320,8 +320,167 @@ public interface RunRepository extends ListCrudRepository<Run, Integer> {
     @Query("SELECT * FROM run WHERE location = :location")
     List<Run> findByLocation(String location);
 }
+```
+
+### REST Client
+
+A REST client is a tool or library that allows you to interact with RESTful web services. It can send HTTP requests to a REST API and receive responses. REST clients are used for testing, debugging, and consuming RESTful APIs.  In the context of your project, you can use tools like curl, httpie, or Postman to interact with your Spring Boot application's REST endpoints. For example, you can use httpie to send a GET request to your RunController:
+`http :8080/api/runs`
+
+**Web Client** is a blocking, synchronous client with this nice, fluent API. Really easy to use
+
+
+**HTTP Interfaces** - That allows you to talk to another service by just defining an interface 
+and not having to write the low level implementations to talk to another service.
+
+Just define interface and Spring will create the implementation for you. like that HTTP interface (analogues) will work for you.
+
+To get the full list of fake users from the API, you can visit this URL in your browser:
+
+https://jsonplaceholder.typicode.com/users
 
 ```
+    {
+        "id": 1,
+        "name": "Leanne Graham",
+        "username": "Bret",
+        "email": "Sincere@april.biz",
+        "address": {
+            "street": "Kulas Light",
+            "suite": "Apt. 556",
+            "city": "Gwenborough",
+            "zipcode": "92998-3874",
+            "geo": {
+            "lat": "-37.3159",
+            "lng": "81.1496"
+    }
+    },
+        "phone": "1-770-736-8031 x56442",
+        "website": "hildegard.org",
+        "company": {
+            "name": "Romaguera-Crona",
+            "catchPhrase": "Multi-layered client-server neural-net",
+            "bs": "harness real-time e-markets"
+        }
+    },
+    
+```
+
+We are going to create a record based on this user.
+```java
+//User - record
+public record User(
+    Integer id,
+    String name,
+    String username,
+    String email,
+    Address address,
+    String phone,
+    String website,
+    Company company
+
+) {
+}
+
+
+//Address - record
+public record Address(
+    String street,
+    String suite,
+    String city,
+    String zipcode,
+    Geo geo
+) {
+}
+
+//Geo - record
+public record Geo(
+    String lat,
+    String lng
+) {
+}
+
+//Company - record
+public record Company(
+    String name,
+    String catchPhrase,
+    String bs
+) {
+}
+```
+
+Then UserRestClient to get the data from the API.
+
+RestClient.Builder is a interface of RestClient
+```java
+@Component
+public class UserRestClient {
+
+    private final RestClient restClient;
+
+    public UserRestClient(RestClient.Builder builder){
+        this.restClient = builder
+                .baseUrl("https://jsonplaceholder.typicode.com/")
+                .build();
+    }
+
+    public List<User> findAll(){
+        return restClient.get()
+                .uri("/users")
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {
+                });
+    }
+
+    public User findById(Integer id){
+        return restClient.get()
+                .uri("/users/{id}", id)
+                .retrieve()
+                .body(User.class);
+    }
+}
+
+```
+
+And then access from main file.
+
+```java
+	@Bean
+	CommandLineRunner runner(UserRestClient client) {
+		return args -> {
+			List<User> users = client.findAll();
+			System.out.println(users);
+
+			User user = client.findById(1);
+			System.out.println(user);
+		};
+	}
+
+```
+
+Can customize like this as well.
+
+```java
+    public UserRestClient(RestClient.Builder builder){
+
+        JdkClientHttpRequestFactory jdkClientHttpRequestFactory = new JdkClientHttpRequestFactory();
+        jdkClientHttpRequestFactory.setReadTimeout(5000);
+        this.restClient = builder
+                .baseUrl("https://jsonplaceholder.typicode.com/")
+                .requestFactory(jdkClientHttpRequestFactory)
+                .build();
+    }
+```
+Can send user header as well
+```java
+                .defaultHeader("User-Agent", "Spring 5 WebClient")
+
+```
+                .requestInterceptor()
+
+Even i write code in UserRestClient. We saw already, declare an interface and let the spring to do 
+
+
 
 Note: 
 * To create an object.
